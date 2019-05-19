@@ -51,14 +51,14 @@ def getSpliceJunctions(_startPos, _CIGAR):
     return spJnList
 
 
-def parseLogFile(_path2TP, _readIDColumn):
+def parseLogFile(_path2File, _readIDColumn):
     """
     Parse true/false positives log file produced by benchCT
-    :param _path2TP: path to true positives log file
+    :param _path2File: path to true positives log file
     :param _readIDColumn: readID column is 0 for false  positives, 1 for true positives
     :return: spliceJunctions set contains hashes of splice junctions, hash = chromosome_start_end_lengthN
     """
-    file = open(_path2TP, "r")
+    file = open(_path2File, "r")
     spliceJunctions = set()
 
     for line in file.readlines():
@@ -78,15 +78,13 @@ def parseLogFile(_path2TP, _readIDColumn):
         startPos1 = int(readOneInfo[1]) + 1
         startPos2 = int(readTwoInfo[1]) + 1
 
-
         CIGAR1 = readOneInfo[3].split(':')[0]
         CIGAR2 = readTwoInfo[3]
 
         if CIGAR2[len(CIGAR2) - 2] == '/':
             CIGAR2 = CIGAR2[0:-2]
 
-        for spJ in  getSpliceJunctions(startPos1, CIGAR1):
-            # spliceJunctions.append([readID, spJ])
+        for spJ in getSpliceJunctions(startPos1, CIGAR1):
             spJHash = chromsome1  + "_" + str(spJ[2]) + "_" + str(spJ[0]) + "_" + str(spJ[1])
             spliceJunctions.add(spJHash)
             if spJHash in spJ2readID.keys():
@@ -94,13 +92,7 @@ def parseLogFile(_path2TP, _readIDColumn):
             else:
                 spJ2readID[spJHash] = [readID]
 
-            if readID == "77871310:X,130340251,+,100M;X,130340337,-,16M4828N84M:AAAAAAAAAAAAAAAoJ/1":
-                print("\t\t" + spJHash)
-
-
-
-        for spJ in  getSpliceJunctions(startPos2, CIGAR2):
-            # spliceJunctions.append([readID, spJ])
+        for spJ in getSpliceJunctions(startPos2, CIGAR2):
             spJHash = chromsome2 + "_" + str(spJ[2]) + "_" + str(spJ[0]) + "_" + str(spJ[1])
             spliceJunctions.add(spJHash)
             
@@ -108,9 +100,6 @@ def parseLogFile(_path2TP, _readIDColumn):
                 spJ2readID[spJHash].append(readID)
             else:
                 spJ2readID[spJHash] = [readID]
-
-            if readID == "77871310:X,130340251,+,100M;X,130340337,-,16M4828N84M:AAAAAAAAAAAAAAAoJ/1":
-                print("\t" + spJHash)
 
     file.close()
 
